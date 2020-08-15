@@ -18,6 +18,8 @@
 #include <stddef.h>
 #if defined __ANDROID__ || defined __linux__
 #include <sched.h>
+#else
+#include <cstring>
 #endif
 
 namespace ncnn {
@@ -49,7 +51,7 @@ public:
 #if defined __ANDROID__ || defined __linux__
         CPU_SET(cpu, &m_bits);
 #else
-        m_bits[(cpu) / NCNN_NCPUBITS] |= (1UL << ((cpu) % NCNN_NCPUBITS)));
+        m_bits[(cpu) / NCNN_NCPUBITS] |= (1UL << ((cpu) % NCNN_NCPUBITS));
 #endif
     }
 
@@ -67,7 +69,7 @@ public:
 #if defined __ANDROID__ || defined __linux__
         CPU_CLR(cpu, &m_bits);
 #else
-        m_bits[(cpu) / NCNN_NCPUBITS] &= (!(1UL << ((cpu) % NCNN_NCPUBITS))));
+        m_bits[(cpu) / NCNN_NCPUBITS] &= (!(1UL << ((cpu) % NCNN_NCPUBITS)));
 #endif
     }
 
