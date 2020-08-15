@@ -78,7 +78,7 @@ public:
 #if defined __ANDROID__ || defined __linux__
         return CPU_ISSET(cpu, &m_bits);
 #else
-        return m_bits[(cpu) / NCNN_NCPUBITS] & (1UL << ((cpu) % NCNN_NCPUBITS)));
+        return m_bits[(cpu) / NCNN_NCPUBITS] & (1UL << ((cpu) % NCNN_NCPUBITS));
 #endif
     }
 };
