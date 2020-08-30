@@ -26,24 +26,14 @@ namespace ncnn {
 
 class CpuSet
 {
-private:
-#if defined __ANDROID__ || defined __linux__
-    cpu_set_t m_bits;
-#else
-#define CPU_SETSIZE   1024
-#define NCNN_NCPUBITS (8 * sizeof(unsigned long))
-    unsigned long m_bits[CPU_SETSIZE / NCNN_NCPUBITS];
-#endif
-
 public:
-    void* data_ptr()
+    CpuSet()
     {
-        return static_cast<void*>(&m_bits);
-    }
-
-    size_t data_size()
-    {
-        return sizeof(m_bits);
+#if defined __ANDROID__ || defined __linux__
+        CPU_ZERO(&m_bits);
+#else
+        m_bits = {0};
+#endif
     }
 
     void set(int cpu)
@@ -73,7 +63,7 @@ public:
 #endif
     }
 
-    bool isset(int cpu)
+    bool isset(int cpu) const
     {
 #if defined __ANDROID__ || defined __linux__
         return CPU_ISSET(cpu, &m_bits);
@@ -81,6 +71,27 @@ public:
         return m_bits[(cpu) / NCNN_NCPUBITS] & (1UL << ((cpu) % NCNN_NCPUBITS));
 #endif
     }
+    friend int set_sched_affinity(const CpuSet&);
+
+protected:
+    void* data_ptr() const
+    {
+        return (void*)(&m_bits);
+    }
+
+    size_t data_size() const
+    {
+        return sizeof(m_bits);
+    }
+
+private:
+#if defined __ANDROID__ || defined __linux__
+    cpu_set_t m_bits;
+#else
+#define NCNN_CPU_SETSIZE   1024
+#define NCNN_NCPUBITS (8 * sizeof(unsigned long))
+    unsigned long m_bits[NCNN_CPU_SETSIZE / NCNN_NCPUBITS];
+#endif
 };
 
 // test optional cpu features
@@ -109,7 +120,7 @@ int get_cpu_powersave();
 int set_cpu_powersave(int powersave);
 
 // convenient wrapper
-CpuSet get_cpu_thread_affinity_mask(int powersave);
+const CpuSet& get_cpu_thread_affinity_mask(int powersave);
 
 // set explicit thread affinity
 int set_cpu_thread_affinity(CpuSet thread_affinity_mask);
