@@ -88,8 +88,8 @@ private:
 #if defined __ANDROID__ || defined __linux__
     cpu_set_t m_bits;
 #else
-#define NCNN_CPU_SETSIZE   1024
-#define NCNN_NCPUBITS (8 * sizeof(unsigned long))
+#define NCNN_CPU_SETSIZE 1024
+#define NCNN_NCPUBITS    (8 * sizeof(unsigned long))
     unsigned long m_bits[NCNN_CPU_SETSIZE / NCNN_NCPUBITS];
 #endif
 };
